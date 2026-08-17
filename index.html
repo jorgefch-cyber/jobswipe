@@ -268,6 +268,28 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
 .msheet .mb button{flex:1;padding:13px;border-radius:12px;font-size:14px;font-weight:700}
 .msheet .mb .ok{background:var(--yes);color:#08221c}
 .msheet .mb .cx{background:var(--surface);border:1px solid var(--line-2);color:var(--txt-2)}
+
+.act.sup{width:52px;height:52px;border-color:rgba(246,185,59,.5);color:var(--warn);position:relative}
+.act.sup svg{width:23px;height:23px}
+.act.sup .cr{position:absolute;top:-3px;right:-3px;background:var(--warn);color:#1a1400;font-size:9px;font-weight:800;min-width:17px;height:17px;border-radius:100px;display:grid;place-items:center;padding:0 4px}
+.act.sup.off{opacity:.35}
+.alert{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:14px;padding:13px;margin-bottom:9px}
+.alert.hit{border-left-color:var(--yes)}
+.alert .ah{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--accent);margin-bottom:6px}
+.alert.hit .ah{color:var(--yes)}
+.alert .at{font-size:13.5px;line-height:1.45;color:var(--txt);margin-bottom:4px}
+.alert .as{font-size:11.5px;color:var(--txt-3);line-height:1.4}
+.alert .ax{display:inline-block;margin-top:9px;font-size:11.5px;font-weight:700;padding:7px 11px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line-2);color:var(--txt);text-decoration:none}
+.stsel{width:100%;background:var(--bg);border:1px solid var(--line-2);border-radius:11px;padding:11px 13px;color:var(--txt);font-size:13.5px;margin-bottom:8px}
+.stsel:focus{outline:none;border-color:var(--accent)}
+.nota{width:100%;background:var(--bg);border:1px solid var(--line-2);border-radius:11px;padding:11px 13px;color:var(--txt);font-size:13.5px;resize:vertical;margin-bottom:8px}
+.nota:focus{outline:none;border-color:var(--accent)}
+.savebtn{width:100%;background:var(--accent);color:#0a0d18;font-weight:700;padding:11px;border-radius:11px;font-size:13.5px}
+.p-agend{background:rgba(45,212,167,.15);color:var(--yes)}
+.p-poragend{background:rgba(246,185,59,.18);color:var(--warn)}
+.p-oferta{background:rgba(45,212,167,.25);color:var(--yes)}
+.p-buscaron{background:rgba(123,140,255,.18);color:var(--accent)}
+.p-sinsenal{background:var(--surface-2);color:var(--txt-3)}
 ::-webkit-scrollbar{width:0;display:none}
 </style>
 </head>
@@ -295,6 +317,11 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
       </div>
 
       <div class="psec">
+        <h3>Movimiento <em id="mvcount"></em></h3>
+        <div id="alerts"></div>
+      </div>
+
+      <div class="psec">
         <h3>Necesito algo de ti <em id="pncount"></em></h3>
         <div id="pend"></div>
       </div>
@@ -312,6 +339,10 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
       <button class="act no" onclick="decide('no')" aria-label="No"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
       <button class="act skip" onclick="decide('skip')" aria-label="Después"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg></button>
       <button class="act yes" onclick="decide('yes')" aria-label="Sí"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></button>
+      <button class="act sup" id="supBtn" onclick="decide('super')" aria-label="Super like">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 2l3 6.6 7 .9-5.1 4.9 1.3 7L12 18l-6.2 3.4 1.3-7L2 9.5l7-.9z"/></svg>
+        <span class="cr" id="supCr">5</span>
+      </button>
     </div>
   </section>
 
@@ -453,7 +484,8 @@ async function fsAdd(col, data){
 }
 
 /* ---------------- estado ---------------- */
-let JOBS = [], ALLJOBS = [], HIST = [], CHAT = [], EVENTS = [], SETTINGS = {}, decided = new Set();
+let JOBS = [], ALLJOBS = [], HIST = [], CHAT = [], EVENTS = [], ALERTS = [], SETTINGS = {}, decided = new Set();
+let creditos = 5;
 let segActivo = 'enviadas';
 let i = 0, ready = false, settingsLoaded = false;
 
@@ -465,9 +497,11 @@ const conn = st => document.getElementById('conn').className = 'dot' + (st==='ok
 /* ---------------- sincronización ---------------- */
 async function sync(){
   try{
-    const [jobs, apps, chat, evs] = await Promise.all([
-      fsList('jobs'), fsList('apps').catch(()=>[]), fsList('chat').catch(()=>[]), fsList('events').catch(()=>[])
+    const [jobs, apps, chat, evs, alr] = await Promise.all([
+      fsList('jobs'), fsList('apps').catch(()=>[]), fsList('chat').catch(()=>[]),
+      fsList('events').catch(()=>[]), fsList('alerts').catch(()=>[])
     ]);
+    ALERTS = alr.filter(a => !a.visto).sort((a,b) => String(b.ts||'').localeCompare(String(a.ts||'')));
     EVENTS = evs.filter(e => !e.start || new Date(e.start) > new Date(Date.now()-3*3600e3))
                 .sort((a,b) => String(a.start||'').localeCompare(String(b.start||'')));
     ALLJOBS = jobs;
@@ -486,6 +520,7 @@ async function sync(){
       const s = await fsList('settings').catch(()=>[]);
       const f = s.find(x => x._id === 'filters');
       if(f){ SETTINGS = f; applySettings(); }
+      if(SETTINGS.inmails != null) creditos = SETTINGS.inmails;
       settingsLoaded = true;
     }
     ready = true; conn('ok');
@@ -629,23 +664,44 @@ function fly(el,d){ el.style.transform = `translate(${d*innerWidth*1.3}px,90px) 
 
 function decide(v){
   if(!JOBS.length || i >= JOBS.length) return;
+  if(v === 'super' && creditos <= 0){ toast('Sin créditos InMail este mes'); return; }
   const top = document.querySelector('#deck .card'); if(!top) return;
   top.classList.add('anim');
   if(v === 'skip'){ top.style.transform='translateY(-130%) scale(.9)'; top.style.opacity='0'; }
+  else if(v === 'super'){ top.querySelector('.stamp.y').style.opacity='1'; top.style.transform='translateY(-130%) scale(.85) rotate(6deg)'; top.style.opacity='0'; }
   else { top.querySelector(v==='yes'?'.stamp.y':'.stamp.n').style.opacity='1'; fly(top, v==='yes'?1:-1); }
   commit(v);
 }
 async function commit(v){
   const j = JOBS[i]; if(!j) return;
-  toast({yes:`Aplicando a ${j.co}`, no:'Descartada', skip:'Guardada para después'}[v]);
+  toast({yes:`Aplicando a ${j.co}`, no:'Descartada', skip:'Guardada para después',
+         super:`Super like — te preparo el mensaje para ${j.co}`}[v]);
+  if(v === 'super'){
+    creditos = Math.max(0, creditos - 1);
+    fsSet('settings','filters', Object.assign({}, SETTINGS, {inmails: creditos})).catch(()=>{});
+    fsAdd('inmails', {jobId: j._id, co: j.co, role: j.role, estado:'por_redactar',
+                      ts: new Date().toISOString()}).catch(()=>{});
+  }
   decided.add(j._id);
   JOBS = JOBS.filter(x => x._id !== j._id);
   if(i >= JOBS.length) i = 0;
   setTimeout(()=>{renderDeck(); renderPanel();}, 280);
-  try{ await fsPatch('jobs', j._id, { decision: v, decidedAt: new Date().toISOString() }); }
+  try{ await fsPatch('jobs', j._id, { decision: v === 'super' ? 'yes' : v, superLike: v === 'super', decidedAt: new Date().toISOString() }); }
   catch(e){ toast('Guardado local, sin conexión'); decided.delete(j._id); }
 }
 
+
+const ESTADOS = [
+  'Enviada', 'Sin señal', 'CV visto', 'Te buscaron en LinkedIn',
+  'Entrevista por agendar', 'Entrevista agendada', 'Oferta',
+  'No avanzó', 'Yo la cancelé'
+];
+const PILL = s => ({
+  'Enviada':'p-sent', 'Sin señal':'p-sinsenal', 'CV visto':'p-view',
+  'Te buscaron en LinkedIn':'p-buscaron', 'Entrevista por agendar':'p-poragend',
+  'Entrevista agendada':'p-agend', 'Oferta':'p-oferta',
+  'No avanzó':'p-rej', 'Yo la cancelé':'p-rej'
+}[s] || 'p-wait');
 
 /* ---------------- panel ---------------- */
 const DIAS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
@@ -691,6 +747,36 @@ function renderPanel(){
     </div>`).join('')
     : `<div class="mini" style="justify-content:center;color:var(--txt-3);font-size:12.5px;padding:16px">Sin entrevistas agendadas todavía. Cuando una empresa te cite, la meto a tu Google Calendar y aparece aquí con el CV que envié.</div>`;
 
+  // movimiento: quién te vio y quién te escribió
+  const av = document.getElementById('alerts');
+  document.getElementById('mvcount').textContent = ALERTS.length ? `${ALERTS.length} nuevo${ALERTS.length>1?'s':''}` : '';
+  av.innerHTML = ALERTS.length ? ALERTS.map(a => {
+    const aplico = a.aplicaste === true;
+    if(a.tipo === 'mensaje'){
+      return `<div class="alert hit">
+        <div class="ah">Te escribieron · ${esc(NA(a.co))}</div>
+        <div class="at">${esc(NA(a.quien))}${a.cargo ? ' · ' + esc(a.cargo) : ''}</div>
+        <div class="as">${esc((a.texto||'').slice(0,180))}${(a.texto||'').length>180?'…':''}</div>
+        ${a.url ? `<a class="ax" href="${esc(a.url)}" target="_blank" rel="noopener">Ver el mensaje</a>` : ''}
+        <button class="ax" onclick="marcarVisto('${esc(a._id)}')">Ya lo vi</button>
+      </div>`;
+    }
+    return `<div class="alert ${aplico ? 'hit' : ''}">
+      <div class="ah">Te buscaron · ${esc(NA(a.co))}</div>
+      <div class="at">${esc(NA(a.quien))}${a.cargo ? ' · ' + esc(a.cargo) : ''} vio tu perfil</div>
+      <div class="as">${aplico
+        ? '✓ Sí aplicaste aquí' + (a.role ? ' — ' + esc(a.role) : '') + '. Que te busquen después de aplicar es buena señal.'
+        : 'No has aplicado a esta empresa. Puede ser búsqueda proactiva de un reclutador.'}</div>
+      ${a.url ? `<a class="ax" href="${esc(a.url)}" target="_blank" rel="noopener">Ver su perfil</a>` : ''}
+      <button class="ax" onclick="marcarVisto('${esc(a._id)}')">Ya lo vi</button>
+    </div>`;
+  }).join('')
+    : `<div class="mini" style="justify-content:center;color:var(--txt-3);font-size:12.5px;padding:16px">Sin movimiento nuevo. Aquí te aviso cuando alguien vea tu perfil o te escriba por una oportunidad.</div>`;
+
+  // créditos de super like
+  const sb = document.getElementById('supBtn'), sc = document.getElementById('supCr');
+  if(sb && sc){ sc.textContent = creditos; sb.classList.toggle('off', creditos <= 0); }
+
   // pendientes con respuesta rápida ahí mismo
   const pe = document.getElementById('pend');
   document.getElementById('pncount').textContent = pend.length ? `${pend.length} sin responder` : '';
@@ -715,6 +801,22 @@ function renderPanel(){
       <div class="mi"><b>${esc(NA(j.role))}</b><span>${esc(NA(j.co))} · ${esc(NA(j.fuente || j.src))}</span></div>
       <span class="sc">${j.match || ''}</span>
     </div>`).join('') || `<div class="mini" style="justify-content:center;color:var(--txt-3);font-size:12.5px;padding:16px">Nada por revisar ahorita.</div>`;
+}
+
+async function marcarVisto(id){
+  ALERTS = ALERTS.filter(a => a._id !== id);
+  renderPanel();
+  try{ await fsPatch('alerts', id, {visto:true}); }catch(e){}
+}
+async function guardarEstado(id){
+  const est = document.getElementById('st_'+id).value;
+  const nota = document.getElementById('nt_'+id).value.trim();
+  const h = HIST.find(x => x._id === id);
+  if(h){ h.status = est; h.nota = nota; h.actualizadoPor = 'Jorge'; }
+  renderHist(); renderPanel();
+  toast('Estatus actualizado');
+  try{ await fsPatch('apps', id, {status:est, nota:nota, actualizadoPor:'Jorge', actualizadoEl:new Date().toISOString()}); }
+  catch(e){ toast('No se pudo guardar'); }
 }
 
 async function responder(id){
@@ -825,9 +927,9 @@ function renderHist(){
   if(segActivo === 'enviadas'){
     const st = {env:HIST.length, vis:0, ent:0, rec:0};
     HIST.forEach(h => { const t=(h.status||'').toLowerCase();
-      if(t.includes('visto')) st.vis++;
-      if(t.includes('entrevista')) st.ent++;
-      if(t.includes('no avanz')||t.includes('rechaz')) st.rec++; });
+      if(t.includes('visto') || t.includes('buscaron')) st.vis++;
+      if(t.includes('entrevista') || t.includes('oferta')) st.ent++;
+      if(t.includes('no avanz')||t.includes('cancel')) st.rec++; });
     stEl.className = 'stats';
     stEl.innerHTML = `
       <div class="stat"><b style="color:var(--accent)">${st.env}</b><span>Enviadas</span></div>
@@ -839,7 +941,7 @@ function renderHist(){
         <div class="row-head" onclick="toggle(${k})">
           <div class="logo" style="background:${esc(h.color||'#7b8cff')}">${initial(h.co)}</div>
           <div class="info"><b>${esc(NA(h.role))}</b><span>${esc(NA(h.co))} · ${esc(NA(h.when))}</span></div>
-          <span class="pill ${CLS(h.status)}">${esc(NA(h.status))}</span>
+          <span class="pill ${PILL(h.status)}">${esc(NA(h.status))}</span>
           <span class="chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></span>
         </div>
         <div class="vault"><div class="vault-in">
@@ -850,6 +952,13 @@ function renderHist(){
           <div class="f"><span class="k">Contraseña</span><span class="v">${esc(NA(h.pass))}</span><button class="cp" onclick="cp(event,'${esc(h.pass||'')}')">Copiar</button></div>
           <div class="f"><span class="k">CV enviado</span><span class="v" style="font-size:11.5px">${esc(NA(h.cv))}</span></div>
           ${h.url && h.url!=='NA' ? `<a class="open-btn" href="${esc(h.url)}" target="_blank" rel="noopener">Abrir el portal</a>` : ''}
+          <div class="vh" style="margin-top:16px">Actualizar tú mismo</div>
+          <p style="font-size:11.5px;color:var(--txt-3);line-height:1.45;margin-bottom:9px">Si te contactaron por WhatsApp o llamada, dímelo aquí y yo lo tomo en cuenta.</p>
+          <select class="stsel" id="st_${esc(h._id)}">
+            ${ESTADOS.map(e => `<option ${e===h.status?'selected':''}>${esc(e)}</option>`).join('')}
+          </select>
+          <textarea class="nota" id="nt_${esc(h._id)}" rows="2" placeholder="Nota: qué te dijeron, por dónde te contactaron, siguientes pasos…">${esc(h.nota||'')}</textarea>
+          <button class="savebtn" onclick="guardarEstado('${esc(h._id)}')">Guardar</button>
         </div></div>
       </div>`).join('')
       : `<div class="empty" style="padding:30px 10px"><h3>Todavía nada enviado</h3>
