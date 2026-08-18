@@ -670,7 +670,8 @@ function reintentarTrasCuota(){
       await fsList('settings');
       clearInterval(reintentoCuota); reintentoCuota = null;
       toast('Ya volvió la cuota, cargando tus vacantes');
-      sync();
+      escuchando = false;
+      if(!escuchar()) sync();
     }catch(e){}
   }, 300000);
 }
@@ -688,42 +689,79 @@ function cuandoVuelveLaCuota(){
 }
 
 /* ---------------- sincronización ---------------- */
+/* ---------------- datos en vivo ----------------
+   ANTES: se releía todo cada X segundos. Con 90 documentos eso daba
+   129,600 lecturas al día si Jorge dejaba la pestaña abierta — dos veces
+   y media el límite gratis de Firestore, y por eso se cayó.
+   AHORA: escuchamos con onSnapshot. Firestore cobra los 90 documentos una
+   sola vez al conectar, y después SOLO los que cambian. Un día entero con
+   la app abierta cuesta unos cientos de lecturas en vez de cien mil.
+   El sondeo por REST queda como respaldo si el SDK no carga.          */
+
+function aplicar(d){
+  if(d.alerts) ALERTS = d.alerts.filter(a => !a.visto)
+    .sort((a,b) => String(b.ts||'').localeCompare(String(a.ts||'')));
+
+  if(d.events) EVENTS = d.events.filter(e => !e.start || new Date(e.start) > new Date(Date.now()-3*3600e3))
+    .sort((a,b) => String(a.start||'').localeCompare(String(b.start||'')));
+
+  if(d.jobs){
+    ALLJOBS = d.jobs;
+    const pend = d.jobs.filter(j => !j.decision && !decided.has(j._id));
+    pend.sort((a,b) => (b.match||0) - (a.match||0));
+    const igual = pend.length === JOBS.length && pend.every((j,k) => JOBS[k] && j._id === JOBS[k]._id);
+    if(!igual && !escribiendo()){ JOBS = pend; if(i >= JOBS.length) i = 0; renderDeck(); }
+  }
+
+  if(d.apps) HIST = d.apps.sort((a,b) => String(b.ts||'').localeCompare(String(a.ts||'')));
+
+  if(d.chat){
+    const c = d.chat.sort((a,b) => String(a.ts||'').localeCompare(String(b.ts||'')));
+    if(c.length !== CHAT.length){ CHAT = c; chatSucio = true; }
+  }
+
+  if(d.settings && !settingsLoaded){
+    const f = d.settings.find(x => x._id === 'filters');
+    if(f){ SETTINGS = f; applySettings(); }
+    if(SETTINGS.inmails != null) creditos = SETTINGS.inmails;
+    settingsLoaded = true;
+  }
+
+  ready = true; conn('ok');
+  if(!JOBS.length) renderDeck();
+  repintar();
+}
+
+function fallaDeDatos(e){
+  const msg = (e && (e.message || e.code)) || '';
+  const cuota = /HTTP 429|resource-exhausted|quota/i.test(msg);
+  conn(cuota ? 'cuota' : 'err');
+  if(!ready) deckError(cuota ? 'HTTP 429' : msg);
+  if(cuota) reintentarTrasCuota();
+}
+
+let escuchando = false;
+function escuchar(){
+  if(escuchando || !window.__escuchar) return false;
+  escuchando = true;
+  ['jobs','apps','chat','events','alerts','settings'].forEach(col => {
+    window.__escuchar(col, (docs, err) => {
+      if(err){ fallaDeDatos(err); return; }
+      aplicar({[col]: docs});
+    });
+  });
+  return true;
+}
+
 async function sync(){
   try{
     const [jobs, apps, chat, evs, alr] = await Promise.all([
       fsList('jobs'), fsList('apps').catch(()=>[]), fsList('chat').catch(()=>[]),
       fsList('events').catch(()=>[]), fsList('alerts').catch(()=>[])
     ]);
-    ALERTS = alr.filter(a => !a.visto).sort((a,b) => String(b.ts||'').localeCompare(String(a.ts||'')));
-    EVENTS = evs.filter(e => !e.start || new Date(e.start) > new Date(Date.now()-3*3600e3))
-                .sort((a,b) => String(a.start||'').localeCompare(String(b.start||'')));
-    ALLJOBS = jobs;
-    const pend = jobs.filter(j => !j.decision && !decided.has(j._id));
-    pend.sort((a,b) => (b.match||0) - (a.match||0));
-    const sameSet = pend.length === JOBS.length && pend.every((j,k) => JOBS[k] && j._id === JOBS[k]._id);
-    if(!sameSet && !escribiendo()){ JOBS = pend; if(i >= JOBS.length) i = 0; renderDeck(); }
-
-    HIST = apps.sort((a,b) => String(b.ts||'').localeCompare(String(a.ts||'')));
-
-    const c = chat.sort((a,b) => String(a.ts||'').localeCompare(String(b.ts||'')));
-    if(c.length !== CHAT.length){ CHAT = c; chatSucio = true; }
-
-    if(!settingsLoaded){
-      const s = await fsList('settings').catch(()=>[]);
-      const f = s.find(x => x._id === 'filters');
-      if(f){ SETTINGS = f; applySettings(); }
-      if(SETTINGS.inmails != null) creditos = SETTINGS.inmails;
-      settingsLoaded = true;
-    }
-    ready = true; conn('ok');
-    if(!JOBS.length) renderDeck();
-    repintar();
-  }catch(e){
-    const cuota = /HTTP 429/.test(e.message || '');
-    conn(cuota ? 'cuota' : 'err');
-    if(!ready) deckError(e.message);
-    if(cuota) reintentarTrasCuota();
-  }
+    const st = settingsLoaded ? null : await fsList('settings').catch(()=>[]);
+    aplicar({jobs, apps, chat, events: evs, alerts: alr, settings: st});
+  }catch(e){ fallaDeDatos(e); }
 }
 
 /* ---------------- deck ---------------- */
@@ -1573,14 +1611,12 @@ let arrancado = false;
 function arrancar(){
   if(arrancado) return;
   arrancado = true;
+  if(escuchar()) return;   // datos en vivo: casi no consume cuota
+  /* respaldo si el SDK de Firestore no cargó: sondeo cada 2 minutos y solo
+     con la pestaña a la vista, para no volver a tronar la cuota diaria */
   sync();
-  /* Firestore en plan gratis da 50,000 lecturas al día. Cada sync lee todos
-     los documentos de 5 colecciones (~110 hoy). Refrescar cada 8 segundos se
-     comía la cuota entera en una hora y la app devolvía HTTP 429.
-     Ahora solo refresca cuando la pestaña está a la vista, y cada 60s. */
-  setInterval(() => { if(document.visibilityState === 'visible') sync(); }, 60000);
+  setInterval(() => { if(document.visibilityState === 'visible') sync(); }, 120000);
   document.addEventListener('visibilitychange', () => { if(!document.hidden) sync(); });
-  window.addEventListener('focus', () => { if(ready) sync(); });
 }
 /* si en 3.5s Firebase no cargó (sin red, CDN bloqueado, etc.) arranca igual:
    más vale la app funcionando con la API key que una pantalla en blanco */
@@ -1598,6 +1634,8 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
            getRedirectResult, onAuthStateChanged, signOut,
            setPersistence, browserLocalPersistence, indexedDBLocalPersistence
          } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, collection, onSnapshot }
+         from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
   const app = initializeApp({
     apiKey: "AIzaSyCXyQZSYeaWV97Jgal0OsUpURPZEcqStyg",
@@ -1620,6 +1658,17 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.__fbSalir    = () => signOut(auth);
 
   try { await getRedirectResult(auth); } catch(e) {}
+
+  /* ---- datos en vivo ----
+     onSnapshot cobra los documentos una sola vez al abrir el canal y después
+     solo los que cambian. Es la diferencia entre cien mil lecturas al día y
+     unos cientos. Devuelve una función para cerrar el canal. */
+  const db = getFirestore(app);
+  window.__escuchar = (col, cb) => onSnapshot(
+    collection(db, col),
+    snap => cb(snap.docs.map(d => Object.assign({_id: d.id}, d.data())), null),
+    err  => cb(null, err)
+  );
 
   onAuthStateChanged(auth, u => {
     window.__fbUser = u || null;
