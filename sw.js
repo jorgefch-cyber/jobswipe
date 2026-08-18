@@ -1,5 +1,5 @@
 /* JobSwipe service worker: cachea el caparazón, nunca los datos. */
-const CACHE = 'jobswipe-v6';
+const CACHE = 'jobswipe-v7';
 const SHELL = ['./index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {

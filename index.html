@@ -290,6 +290,12 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
 .p-oferta{background:rgba(45,212,167,.25);color:var(--yes)}
 .p-buscaron{background:rgba(123,140,255,.18);color:var(--accent)}
 .p-sinsenal{background:var(--surface-2);color:var(--txt-3)}
+
+.card.fav{border-color:var(--yes);box-shadow:0 0 0 2px var(--yes), 0 18px 50px -12px rgba(0,0,0,.75)}
+.card.fav .src{background:rgba(45,212,167,.07)}
+.ob.fav{background:var(--yes);color:#08221c}
+.row.fav{border-color:rgba(45,212,167,.5);box-shadow:inset 3px 0 0 var(--yes)}
+.mini.fav{border-color:rgba(45,212,167,.45);box-shadow:inset 3px 0 0 var(--yes)}
 ::-webkit-scrollbar{width:0;display:none}
 </style>
 </head>
@@ -579,7 +585,7 @@ function cardHTML(j){
       <div style="flex:1;min-width:0"><div class="co">${esc(NA(j.co))}</div><div class="role">${esc(NA(j.role))}</div></div>
       ${j.match ? `<div class="match"><b>${j.match}</b><span>match</span></div>` : ''}
     </div>
-    <div class="origin"><span class="ob site">${esc(NA(j.fuente || j.src))}</span>${tipo}</div>
+    <div class="origin">${j.favorita ? '<span class="ob fav">★ Empresa de tu lista</span>' : ''}<span class="ob site">${esc(NA(j.fuente || j.src))}</span>${tipo}</div>
     <div class="pay ${hasPay ? '' : 'na'}">
       <div class="amt">${hasPay ? esc(j.pay) : 'Sueldo NA'}</div>
       <div class="per">${hasPay ? esc(NA(j.per)) : 'La vacante no publica sueldo'}</div>
@@ -618,7 +624,7 @@ function renderDeck(){
   }
   for(let k = Math.min(i+2, JOBS.length-1); k >= i; k--){
     const el = document.createElement('div');
-    el.className = 'card'; el.innerHTML = cardHTML(JOBS[k]);
+    el.className = 'card' + (JOBS[k].favorita ? ' fav' : ''); el.innerHTML = cardHTML(JOBS[k]);
     const d = k - i;
     el.style.transform = `translateY(${d*9}px) scale(${1-d*0.032})`;
     el.style.opacity = d > 1 ? '0.35' : '1';
@@ -796,7 +802,7 @@ function renderPanel(){
   const com = JOBS.filter(j => j.tipo === 'completa').length;
   document.getElementById('tipos').textContent = `${rap} rápidas · ${com} completas`;
   document.getElementById('next').innerHTML = JOBS.slice(0,6).map((j,k) => `
-    <div class="mini tap" onclick="irACarta(${k})">
+    <div class="mini tap ${j.favorita ? 'fav' : ''}" onclick="irACarta(${k})">
       <div class="logo" style="background:${esc(j.color||'#7b8cff')};width:34px;height:34px;border-radius:10px;font-size:13px">${initial(j.co)}</div>
       <div class="mi"><b>${esc(NA(j.role))}</b><span>${esc(NA(j.co))} · ${esc(NA(j.fuente || j.src))}</span></div>
       <span class="sc">${j.match || ''}</span>
@@ -884,7 +890,7 @@ function detalleHTML(j){
     : `<button class="ab y" onclick="cambiar('${j._id}','yes')">Sí, aplicar</button>
        <button class="ab n" onclick="cambiar('${j._id}','no')">Descartar</button>`;
   return `<div class="det">
-    <div class="origin"><span class="ob site">${esc(NA(j.fuente || j.src))}</span>
+    <div class="origin">${j.favorita ? '<span class="ob fav">★ Empresa de tu lista</span>' : ''}<span class="ob site">${esc(NA(j.fuente || j.src))}</span>
       ${j.tipo==='rapida'?'<span class="ob fast">Solicitud rápida</span>':j.tipo==='completa'?'<span class="ob full">Aplicación completa</span>':''}</div>
     <div class="pay ${j.pay && j.pay!=='NA' ? '' : 'na'}" style="margin-bottom:12px">
       <div class="amt">${j.pay && j.pay!=='NA' ? esc(j.pay) : 'Sueldo NA'}</div>
@@ -972,7 +978,7 @@ function renderHist(){
                   no:['Nada rechazado','Las que descartes aparecen aquí, por si te arrepientes.'],
                   skip:['Nada en espera','Las que guardes con el botón del reloj aparecen aquí.'] }[segActivo];
   el.innerHTML = lista.length ? lista.map((j,k) => `
-    <div class="row" id="r${k}">
+    <div class="row ${j.favorita ? 'fav' : ''}" id="r${k}">
       <div class="row-head" onclick="toggle(${k})">
         <div class="logo" style="background:${esc(j.color||'#7b8cff')}">${initial(j.co)}</div>
         <div class="info"><b>${esc(NA(j.role))}</b><span>${esc(NA(j.co))} · ${esc(NA(j.fuente||j.src))}</span></div>
