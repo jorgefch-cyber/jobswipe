@@ -343,6 +343,7 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
 .links a{flex:1;text-align:center;font-size:12px;font-weight:700;padding:9px 8px;border-radius:9px;text-decoration:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--txt)}
 .links a.pri{background:var(--accent);border-color:var(--accent);color:#0a0d18}
 .srcline{padding:9px 16px 0;font-size:10.5px;color:var(--txt-3);text-align:center}
+.dot.warn{background:var(--warn);box-shadow:0 0 0 3px rgba(246,185,59,.18)}
 /* ---- login con Google ---- */
 #gate{position:fixed;inset:0;background:var(--bg);z-index:900;display:none;place-items:center;padding:26px}
 #gate.on{display:grid}
@@ -652,7 +653,39 @@ let i = 0, ready = false, settingsLoaded = false;
 const NA = v => (v === undefined || v === null || v === '' || v === 'NA') ? 'NA' : v;
 const initial = s => (s || '?').trim()[0].toUpperCase();
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const conn = st => document.getElementById('conn').className = 'dot' + (st==='ok'?' on':st==='err'?' err':'');
+const conn = st => {
+  const d = document.getElementById('conn');
+  d.className = 'dot' + (st==='ok' ? ' on' : st==='cuota' ? ' warn' : st==='err' ? ' err' : '');
+  d.title = st==='cuota' ? 'Se acabó la cuota diaria de lecturas' : st==='err' ? 'Sin conexión' : '';
+};
+
+/* Firestore gratis corta las lecturas al llegar a 50,000 al día y las
+   reabre a medianoche del Pacífico. No es una falla: es una espera.
+   Mientras tanto reintenta cada 5 min en vez de cada minuto. */
+let reintentoCuota = null;
+function reintentarTrasCuota(){
+  if(reintentoCuota) return;
+  reintentoCuota = setInterval(async () => {
+    try{
+      await fsList('settings');
+      clearInterval(reintentoCuota); reintentoCuota = null;
+      toast('Ya volvió la cuota, cargando tus vacantes');
+      sync();
+    }catch(e){}
+  }, 300000);
+}
+function cuandoVuelveLaCuota(){
+  /* medianoche del Pacífico expresada en la hora local de Jorge */
+  const ahora = new Date();
+  const pac = new Date(ahora.toLocaleString('en-US', {timeZone:'America/Los_Angeles'}));
+  const desfase = ahora - pac;
+  const sig = new Date(pac); sig.setHours(24,0,0,0);
+  const local = new Date(sig.getTime() + desfase);
+  const h = local.getHours().toString().padStart(2,'0');
+  const m = local.getMinutes().toString().padStart(2,'0');
+  const faltan = Math.max(0, Math.round((local - ahora) / 60000));
+  return {hora: h + ':' + m, faltan: faltan};
+}
 
 /* ---------------- sincronización ---------------- */
 async function sync(){
@@ -685,7 +718,12 @@ async function sync(){
     ready = true; conn('ok');
     if(!JOBS.length) renderDeck();
     repintar();
-  }catch(e){ conn('err'); if(!ready) deckError(e.message); }
+  }catch(e){
+    const cuota = /HTTP 429/.test(e.message || '');
+    conn(cuota ? 'cuota' : 'err');
+    if(!ready) deckError(e.message);
+    if(cuota) reintentarTrasCuota();
+  }
 }
 
 /* ---------------- deck ---------------- */
@@ -764,10 +802,27 @@ function cardHTML(j){
   </div>`;
 }
 function deckError(m){
-  document.getElementById('deck').innerHTML =
-    `<div class="empty" style="position:absolute;inset:0"><h3>Sin conexión</h3>
-     <p>No pude alcanzar la base de datos.<br>${esc(m)}</p></div>`;
-  document.getElementById('counter').textContent = 'sin conexión';
+  const cuota = /HTTP 429/.test(m || '');
+  const deck = document.getElementById('deck');
+  if(cuota){
+    const v = cuandoVuelveLaCuota();
+    const espera = v.faltan > 90 ? `unas ${Math.round(v.faltan/60)} horas`
+                 : v.faltan > 1  ? `${v.faltan} minutos` : 'un momento';
+    deck.innerHTML =
+      `<div class="empty" style="position:absolute;inset:0;padding:26px">
+         <h3>Pausa hasta las ${v.hora}</h3>
+         <p>No perdiste nada. Firestore gratis permite 50,000 lecturas al día
+            y hoy se agotaron, así que la base no me deja leer hasta que se
+            reinicie el contador.<br><br>
+            Faltan ${espera}. En cuanto vuelva, la app se carga sola:
+            no tienes que hacer nada.</p></div>`;
+    document.getElementById('counter').textContent = 'vuelve a las ' + v.hora;
+  } else {
+    deck.innerHTML =
+      `<div class="empty" style="position:absolute;inset:0"><h3>Sin conexión</h3>
+       <p>No pude alcanzar la base de datos.<br>${esc(m)}</p></div>`;
+    document.getElementById('counter').textContent = 'sin conexión';
+  }
 }
 function renderDeck(){
   const deck = document.getElementById('deck');
