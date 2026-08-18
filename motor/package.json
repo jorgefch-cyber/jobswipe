@@ -1,0 +1,7 @@
+{
+  "name": "jobswipe-cv",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Generador de CV adaptado por vacante para JobSwipe",
+  "dependencies": { "docx": "^8.5.0" }
+}
