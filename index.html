@@ -1519,8 +1519,13 @@ function arrancar(){
   if(arrancado) return;
   arrancado = true;
   sync();
-  setInterval(sync, 8000);
+  /* Firestore en plan gratis da 50,000 lecturas al día. Cada sync lee todos
+     los documentos de 5 colecciones (~110 hoy). Refrescar cada 8 segundos se
+     comía la cuota entera en una hora y la app devolvía HTTP 429.
+     Ahora solo refresca cuando la pestaña está a la vista, y cada 60s. */
+  setInterval(() => { if(document.visibilityState === 'visible') sync(); }, 60000);
   document.addEventListener('visibilitychange', () => { if(!document.hidden) sync(); });
+  window.addEventListener('focus', () => { if(ready) sync(); });
 }
 /* si en 3.5s Firebase no cargó (sin red, CDN bloqueado, etc.) arranca igual:
    más vale la app funcionando con la API key que una pantalla en blanco */
