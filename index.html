@@ -570,13 +570,12 @@ async function sync(){
     const pend = jobs.filter(j => !j.decision && !decided.has(j._id));
     pend.sort((a,b) => (b.match||0) - (a.match||0));
     const sameSet = pend.length === JOBS.length && pend.every((j,k) => JOBS[k] && j._id === JOBS[k]._id);
-    if(!sameSet){ JOBS = pend; if(i >= JOBS.length) i = 0; renderDeck(); }
+    if(!sameSet && !escribiendo()){ JOBS = pend; if(i >= JOBS.length) i = 0; renderDeck(); }
 
     HIST = apps.sort((a,b) => String(b.ts||'').localeCompare(String(a.ts||'')));
-    renderHist();
 
     const c = chat.sort((a,b) => String(a.ts||'').localeCompare(String(b.ts||'')));
-    if(c.length !== CHAT.length){ CHAT = c; renderChat(); renderTest(); }
+    if(c.length !== CHAT.length){ CHAT = c; chatSucio = true; }
 
     if(!settingsLoaded){
       const s = await fsList('settings').catch(()=>[]);
@@ -587,7 +586,7 @@ async function sync(){
     }
     ready = true; conn('ok');
     if(!JOBS.length) renderDeck();
-    renderPanel(); renderTest();
+    repintar();
   }catch(e){ conn('err'); if(!ready) deckError(e.message); }
 }
 
@@ -904,6 +903,27 @@ async function enviarRespuesta(id, v){
     await fsPatch('chat', id, {needsReply:false});
   }catch(e){ toast('No se pudo enviar'); }
 }
+/* ---------------- no repintar mientras Jorge escribe ----------------
+   sync() corre cada 8s y redibuja Panel, Historial y Test con innerHTML.
+   Si el cursor esta dentro de uno de esos, el elemento se destruye a media
+   escritura: se pierde el texto y el teclado se cierra. Esto lo evita. */
+let repintarPend = false, chatSucio = false;
+function escribiendo(){
+  const a = document.activeElement;
+  if(!a || a === document.body) return false;
+  const t = a.tagName;
+  return t === 'TEXTAREA' || t === 'INPUT' || t === 'SELECT' || a.isContentEditable === true;
+}
+function repintar(){
+  if(escribiendo()){ repintarPend = true; return; }
+  repintarPend = false;
+  if(chatSucio){ chatSucio = false; renderChat(); }
+  renderHist(); renderPanel(); renderTest();
+}
+document.addEventListener('focusout', () => {
+  setTimeout(() => { if(repintarPend && !escribiendo()) repintar(); }, 220);
+});
+
 /* ---------------- test diario ---------------- */
 let TQ = 0;
 function testPend(){ return CHAT.filter(m => m.from==='ai' && m.needsReply && m.opciones && m.opciones.length); }
