@@ -1,5 +1,5 @@
 /* JobSwipe service worker: cachea el caparazón, nunca los datos. */
-const CACHE = 'jobswipe-v11';
+const CACHE = 'jobswipe-v12';
 const SHELL = ['./index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -14,8 +14,13 @@ self.addEventListener('activate', e => {
 
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
-  // Firestore siempre en vivo, nunca desde cache
+  // nada de esto se cachea: datos en vivo y sesion de Google
   if (url.hostname.includes('firestore.googleapis.com')) return;
+  if (url.hostname.includes('identitytoolkit.googleapis.com')) return;
+  if (url.hostname.includes('securetoken.googleapis.com')) return;
+  if (url.hostname.includes('accounts.google.com')) return;
+  if (url.hostname.endsWith('firebaseapp.com')) return;
+  if (url.hostname.includes('ntfy.sh')) return;
   if (e.request.method !== 'GET') return;
   e.respondWith(
     fetch(e.request)
