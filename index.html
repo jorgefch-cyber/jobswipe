@@ -246,6 +246,13 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
 .pq{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:14px;padding:14px;margin-bottom:10px}
 .pq .pqh{font-size:10.5px;color:var(--warn);font-weight:700;text-transform:uppercase;letter-spacing:.6px;margin-bottom:7px}
 .pq p{font-size:13.5px;line-height:1.5;color:var(--txt-2)}
+.opts{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.opts button{text-align:left;background:var(--bg);border:1px solid var(--line-2);border-radius:11px;padding:10px 12px;color:var(--txt);font-size:13px;line-height:1.35;transition:.12s}
+.opts button:active{transform:scale(.985)}
+.opts button:hover{border-color:var(--warn);background:#1b1a17}
+.opts button b{display:block;font-size:13.5px;font-weight:600;margin-bottom:2px}
+.opts button span{color:var(--txt-3);font-size:11.5px}
+.otro{font-size:11.5px;color:var(--txt-3);margin-top:9px;margin-bottom:3px}
 .tap{cursor:pointer;transition:border-color .15s}
 .tap:active{border-color:var(--yes)}
 .times{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
@@ -296,6 +303,15 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
 .ob.fav{background:var(--yes);color:#08221c}
 .row.fav{border-color:rgba(45,212,167,.5);box-shadow:inset 3px 0 0 var(--yes)}
 .mini.fav{border-color:rgba(45,212,167,.45);box-shadow:inset 3px 0 0 var(--yes)}
+
+.reqs{background:rgba(246,185,59,.06);border:1px solid rgba(246,185,59,.2);border-radius:12px;padding:11px 13px}
+.reqs li{font-size:12.5px;line-height:1.45;color:var(--txt-2);margin-bottom:6px;padding-left:15px;position:relative;list-style:none}
+.reqs li:last-child{margin-bottom:0}
+.reqs li::before{content:"›";position:absolute;left:2px;color:var(--warn);font-weight:700}
+.links{display:flex;gap:7px;padding:10px 14px;border-top:1px solid var(--line);background:var(--bg-2);flex-shrink:0}
+.links a{flex:1;text-align:center;font-size:12px;font-weight:700;padding:9px 8px;border-radius:9px;text-decoration:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--txt)}
+.links a.pri{background:var(--accent);border-color:var(--accent);color:#0a0d18}
+.srcline{padding:9px 16px 0;font-size:10.5px;color:var(--txt-3);text-align:center}
 ::-webkit-scrollbar{width:0;display:none}
 </style>
 </head>
@@ -597,14 +613,17 @@ function cardHTML(j){
         <div class="gd">${esc(NA(j.glassdoor))}</div></div>
     </div>
     <div class="chips">${chips}</div>
+    ${(j.requisitos && j.requisitos.length) ? `<div class="sec"><h4>Lo que piden</h4><div class="reqs"><ul>${j.requisitos.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div></div>` : ''}
     <div class="sec"><h4>Cuánto suele tardar</h4>${tiempos(j)}</div>
     <div class="sec"><h4>Qué harías</h4>${resp}</div>
     ${(pros || cons) ? `<div class="sec"><h4>Qué dicen de la empresa</h4><div class="pc">${pros}${cons}</div>${pcNote}</div>` : ''}
     ${j.why ? `<div class="sec why"><h4>Por qué te la propongo</h4><p>${esc(j.why)}</p></div>` : ''}
   </div>
-  <div class="src">
-    <span>${esc(NA(j.src))}</span>
-    ${hasUrl ? `<a href="${esc(j.url)}" target="_blank" rel="noopener">Ver vacante</a>` : `<span>${esc(NA(j.apps))}</span>`}
+  <div class="srcline">${esc(NA(j.src))}${j.apps && j.apps!=='NA' ? ' · ' + esc(j.apps) : ''}</div>
+  <div class="links">
+    ${hasUrl ? `<a class="pri" href="${esc(j.url)}" target="_blank" rel="noopener">Abrir la vacante</a>` : ''}
+    ${j.urlOrigen && j.urlOrigen!=='NA' && j.urlOrigen!==j.url ? `<a href="${esc(j.urlOrigen)}" target="_blank" rel="noopener">Ver en LinkedIn</a>` : ''}
+    ${!hasUrl && !(j.urlOrigen && j.urlOrigen!=='NA') ? '<a style="opacity:.4">Sin link disponible</a>' : ''}
   </div>`;
 }
 function deckError(m){
@@ -790,6 +809,11 @@ function renderPanel(){
     <div class="pq">
       <div class="pqh">${esc(m.ctx || 'Necesito un dato')}</div>
       <p>${esc(m.text)}</p>
+      ${(m.opciones && m.opciones.length) ? `<div class="opts">${m.opciones.map(o => {
+        const lab = typeof o === 'string' ? o : (o.t || '');
+        const des = typeof o === 'string' ? '' : (o.d || '');
+        return `<button onclick="responderOpcion('${esc(m._id)}', this.dataset.v)" data-v="${esc(lab)}"><b>${esc(lab)}</b>${des?`<span>${esc(des)}</span>`:''}</button>`;
+      }).join('')}</div><div class="otro">O escr\u00edbeme otra cosa:</div>` : ''}
       <div class="qr">
         <textarea id="qr_${esc(m._id)}" rows="1" placeholder="Contéstame aquí…" oninput="grow(this)"></textarea>
         <button onclick="responder('${esc(m._id)}')">Enviar</button>
@@ -825,10 +849,17 @@ async function guardarEstado(id){
   catch(e){ toast('No se pudo guardar'); }
 }
 
+async function responderOpcion(id, texto){
+  if(!texto) return;
+  await enviarRespuesta(id, texto);
+}
 async function responder(id){
   const ta = document.getElementById('qr_' + id);
   const v = (ta.value || '').trim(); if(!v) { ta.focus(); return; }
   ta.value = ''; ta.style.height = 'auto';
+  await enviarRespuesta(id, v);
+}
+async function enviarRespuesta(id, v){
   const m = CHAT.find(x => x._id === id);
   if(m) m.needsReply = false;
   CHAT.push({from:'me', text:v, ts:new Date().toISOString(), _id:'tmp'+Date.now()});
@@ -900,9 +931,11 @@ function detalleHTML(j){
       <div class="rate"><div class="rl">Reputación laboral</div><div class="stars">${stars(j.reputacion)}</div>
         <div class="gd">${esc(NA(j.glassdoor))}</div></div></div>
     ${resp}
+    ${(j.requisitos && j.requisitos.length) ? `<h6>Lo que piden</h6><div class="reqs"><ul>${j.requisitos.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div>` : ''}
     ${(pros||cons)?`<h6>Qué dicen de la empresa</h6><div class="pc">${pros}${cons}</div>`:''}
     ${j.why?`<div class="why"><h4>Por qué te la propuse</h4><p>${esc(j.why)}</p></div>`:''}
-    ${j.url && j.url!=='NA' ? `<a class="open-btn" href="${esc(j.url)}" target="_blank" rel="noopener">Ver la vacante original</a>` : ''}
+    ${j.url && j.url!=='NA' ? `<a class="open-btn" href="${esc(j.url)}" target="_blank" rel="noopener">Abrir la vacante</a>` : ''}
+    ${j.urlOrigen && j.urlOrigen!=='NA' && j.urlOrigen!==j.url ? `<a class="open-btn" href="${esc(j.urlOrigen)}" target="_blank" rel="noopener">Ver en LinkedIn</a>` : ''}
     <div class="acts2">${btns}</div>
   </div>`;
 }
@@ -1066,15 +1099,15 @@ function toast(m){
   clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove('on'), 1900);
 }
 
-/* ---------------- service worker ---------------- */
-if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
-}
-
 /* ---------------- arranque ---------------- */
 sync();
 setInterval(sync, 8000);
 document.addEventListener('visibilitychange', () => { if(!document.hidden) sync(); });
+
+/* ---------------- service worker ---------------- */
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
 </script>
 </body>
 </html>
