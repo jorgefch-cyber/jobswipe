@@ -253,6 +253,37 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
 .opts button b{display:block;font-size:13.5px;font-weight:600;margin-bottom:2px}
 .opts button span{color:var(--txt-3);font-size:11.5px}
 .otro{font-size:11.5px;color:var(--txt-3);margin-top:9px;margin-bottom:3px}
+/* ---- Test diario ---- */
+#s-test .scroll{padding-bottom:24px}
+.tprog{display:flex;align-items:center;gap:10px;margin:14px 0 4px}
+.tbar{flex:1;height:6px;background:var(--surface-2);border-radius:100px;overflow:hidden}
+.tbar i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--yes));border-radius:100px;transition:width .35s cubic-bezier(.4,0,.2,1)}
+.tcount{font-size:11.5px;color:var(--txt-3);font-weight:600;flex-shrink:0;font-variant-numeric:tabular-nums}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px 18px 18px;margin-top:14px;animation:qin .28s cubic-bezier(.2,.7,.3,1)}
+@keyframes qin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.qtag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);background:#1b1f33;border:1px solid #2b3155;padding:4px 9px;border-radius:100px;margin-bottom:12px}
+.qtext{font-size:17px;line-height:1.4;font-weight:600;color:var(--txt);margin-bottom:16px}
+.tops{display:flex;flex-direction:column;gap:9px}
+.tops button{text-align:left;background:var(--bg);border:1px solid var(--line-2);border-radius:14px;padding:13px 15px;color:var(--txt);transition:.14s;display:flex;gap:12px;align-items:flex-start}
+.tops button:hover{border-color:var(--accent);background:#161a28}
+.tops button:active{transform:scale(.985)}
+.tops button.pick{border-color:var(--yes);background:var(--yes-dim)}
+.tops .k{flex-shrink:0;width:22px;height:22px;border-radius:7px;background:var(--surface-2);color:var(--txt-3);font-size:11px;font-weight:800;display:grid;place-items:center;margin-top:1px}
+.tops button.pick .k{background:var(--yes);color:#04241c}
+.tops .tx b{display:block;font-size:14.5px;font-weight:600;line-height:1.3}
+.tops .tx span{display:block;color:var(--txt-3);font-size:12px;line-height:1.4;margin-top:3px}
+.tskip{margin-top:14px;display:flex;gap:8px}
+.tskip button{flex:1;background:transparent;border:1px solid var(--line-2);border-radius:12px;padding:11px;color:var(--txt-3);font-size:12.5px;font-weight:600}
+.tskip button:hover{color:var(--txt-2);border-color:var(--txt-3)}
+.tfree{margin-top:12px}
+.tfree textarea{width:100%;background:var(--bg);border:1px solid var(--line-2);border-radius:12px;padding:11px 13px;color:var(--txt);font-size:13.5px;resize:none;max-height:90px;line-height:1.45}
+.tfree textarea:focus{outline:none;border-color:var(--accent)}
+.tdone{text-align:center;padding:44px 22px}
+.tdone .ic{width:66px;height:66px;border-radius:50%;background:var(--yes-dim);border:1px solid var(--yes);display:grid;place-items:center;margin:0 auto 16px}
+.tdone .ic svg{width:30px;height:30px;stroke:var(--yes);stroke-width:2.6;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.tdone h3{font-size:17.5px;margin-bottom:7px}
+.tdone p{font-size:13.5px;color:var(--txt-2);line-height:1.55;max-width:330px;margin:0 auto}
+
 .tap{cursor:pointer;transition:border-color .15s}
 .tap:active{border-color:var(--yes)}
 .times{display:flex;flex-direction:column;gap:7px;margin-bottom:16px}
@@ -386,6 +417,14 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
     </div>
   </section>
 
+  <section class="screen" id="s-test">
+    <div class="scroll">
+      <h1 class="h1">Test diario</h1>
+      <p class="sub">Preguntas cortas para conocerte mejor. Entre más contestes, mejores vacantes te mando.</p>
+      <div id="testBody"></div>
+    </div>
+  </section>
+
   <section class="screen" id="s-filt">
     <div class="scroll">
       <h1 class="h1">Qué buscar</h1>
@@ -420,6 +459,7 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
   <button class="tab" onclick="go('deck',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linejoin="round"><rect x="3" y="5" width="14" height="15" rx="2"/><path d="M20 8v9a2 2 0 01-2 2"/></svg>Descubrir</button>
   <button class="tab" onclick="go('hist',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.6L3 8"/><path d="M3 4v4h4M12 7v5l3 2"/></svg>Historial</button>
   <button class="tab" onclick="go('chat',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-9 8.4 8.5 8.5 0 01-3.8-.9L3 21l2-5.2A8.4 8.4 0 0121 11.5z"/></svg><span class="badge" id="cbadge" style="display:none">0</span>Chat</button>
+  <button class="tab" onclick="go('test',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l2 2 4-4"/><rect x="3" y="4" width="18" height="17" rx="2.5"/><path d="M8 2v4M16 2v4"/></svg><span class="badge" id="tbadge" style="display:none">0</span>Test</button>
   <button class="tab" onclick="go('filt',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filtros</button>
 </nav>
 
@@ -536,7 +576,7 @@ async function sync(){
     renderHist();
 
     const c = chat.sort((a,b) => String(a.ts||'').localeCompare(String(b.ts||'')));
-    if(c.length !== CHAT.length){ CHAT = c; renderChat(); }
+    if(c.length !== CHAT.length){ CHAT = c; renderChat(); renderTest(); }
 
     if(!settingsLoaded){
       const s = await fsList('settings').catch(()=>[]);
@@ -547,7 +587,7 @@ async function sync(){
     }
     ready = true; conn('ok');
     if(!JOBS.length) renderDeck();
-    renderPanel();
+    renderPanel(); renderTest();
   }catch(e){ conn('err'); if(!ready) deckError(e.message); }
 }
 
@@ -747,7 +787,7 @@ function renderPanel(){
   const rev = JOBS.length;
   const env = HIST.length;
   const ent = HIST.filter(h => (h.status||'').toLowerCase().includes('entrevista')).length;
-  const pend = CHAT.filter(m => m.from === 'ai' && m.needsReply);
+  const pend = CHAT.filter(m => m.from === 'ai' && m.needsReply && !(m.opciones && m.opciones.length));
   document.getElementById('pstats').innerHTML = `
     <div class="pcard"><b style="color:var(--yes)">${rev}</b><span>Por revisar</span></div>
     <div class="pcard"><b style="color:var(--accent)">${env}</b><span>Enviadas</span></div>
@@ -809,12 +849,6 @@ function renderPanel(){
     <div class="pq">
       <div class="pqh">${esc(m.ctx || 'Necesito un dato')}</div>
       <p>${esc(m.text)}</p>
-      ${(m.opciones && m.opciones.length) ? `<div class="opts">${m.opciones.map(o => {
-        const lab = typeof o === 'string' ? o : (o.t || '');
-        const des = typeof o === 'string' ? '' : (o.d || '');
-        return `<button onclick="responderOpcion('${esc(m._id)}', this.dataset.v)" data-v="${esc(lab)}"><b>${esc(lab)}</b>${des?`<span>${esc(des)}</span>`:''}</button>`;
-      }).join('')}</div><div class="otro">O escr\u00edbeme otra cosa:</div>` : ''}
-      <div class="qr">
         <textarea id="qr_${esc(m._id)}" rows="1" placeholder="Contéstame aquí…" oninput="grow(this)"></textarea>
         <button onclick="responder('${esc(m._id)}')">Enviar</button>
       </div>
@@ -863,13 +897,79 @@ async function enviarRespuesta(id, v){
   const m = CHAT.find(x => x._id === id);
   if(m) m.needsReply = false;
   CHAT.push({from:'me', text:v, ts:new Date().toISOString(), _id:'tmp'+Date.now()});
-  renderChat(); renderPanel();
+  renderChat(); renderPanel(); renderTest();
   toast('Respuesta enviada');
   try{
     await fsAdd('chat', {from:'me', text:v, ts:new Date().toISOString(), responde:id});
     await fsPatch('chat', id, {needsReply:false});
   }catch(e){ toast('No se pudo enviar'); }
 }
+/* ---------------- test diario ---------------- */
+let TQ = 0;
+function testPend(){ return CHAT.filter(m => m.from==='ai' && m.needsReply && m.opciones && m.opciones.length); }
+
+function renderTest(){
+  const box = document.getElementById('testBody');
+  if(!box) return;
+  const q = testPend();
+  const b = document.getElementById('tbadge');
+  if(b){ b.style.display = q.length ? 'grid' : 'none'; b.textContent = q.length; }
+
+  if(!q.length){
+    box.innerHTML = `<div class="tdone">
+      <div class="ic"><svg viewBox="0 0 24 24"><path d="M4 12.5l5.5 5.5L20 7"/></svg></div>
+      <h3>Vas al corriente</h3>
+      <p>No hay preguntas pendientes. Conforme vaya buscando vacantes te dejo nuevas por aquí, normalmente una o dos al día.</p></div>`;
+    return;
+  }
+  if(TQ >= q.length) TQ = 0;
+  const m = q[TQ];
+  const total = q.length, num = TQ + 1;
+  const letras = ['A','B','C','D','E'];
+
+  box.innerHTML = `
+    <div class="tprog"><div class="tbar"><i style="width:${Math.max(5, Math.round((TQ/total)*100))}%"></i></div>
+      <span class="tcount">${num} de ${total}</span></div>
+    <div class="qcard">
+      <span class="qtag">${esc(m.ctx || 'Para conocerte mejor')}</span>
+      <div class="qtext">${esc(m.text)}</div>
+      <div class="tops">
+        ${m.opciones.map((o,k) => {
+          const lab = typeof o === 'string' ? o : (o.t || '');
+          const des = typeof o === 'string' ? '' : (o.d || '');
+          return `<button onclick="testPick(this,'${esc(m._id)}')" data-v="${esc(lab)}">
+            <span class="k">${letras[k]||'.'}</span>
+            <span class="tx"><b>${esc(lab)}</b>${des?`<span>${esc(des)}</span>`:''}</span></button>`;
+        }).join('')}
+      </div>
+      <div class="tfree"><textarea id="tf_${esc(m._id)}" rows="1" placeholder="¿Ninguna te cuadra? Escríbeme tu respuesta…" oninput="grow(this)"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();testFree('${esc(m._id)}')}"></textarea></div>
+      <div class="tskip">
+        ${total > 1 ? `<button onclick="testSalta()">Esta después</button>` : ''}
+        <button onclick="testFree('${esc(m._id)}')">Enviar lo que escribí</button>
+      </div>
+    </div>`;
+}
+
+function testSalta(){ const q = testPend(); if(q.length > 1){ TQ = (TQ + 1) % q.length; renderTest(); } }
+
+async function testPick(btn, id){
+  const v = btn.dataset.v; if(!v) return;
+  btn.parentElement.querySelectorAll('button').forEach(x => x.classList.remove('pick'));
+  btn.classList.add('pick');
+  btn.parentElement.style.pointerEvents = 'none';
+  setTimeout(async () => { TQ = 0; await enviarRespuesta(id, v); renderTest(); }, 260);
+}
+
+async function testFree(id){
+  const ta = document.getElementById('tf_' + id);
+  const v = ta && (ta.value||'').trim();
+  if(!v){ if(ta) ta.focus(); return; }
+  TQ = 0;
+  await enviarRespuesta(id, v);
+  renderTest();
+}
+
 function irACarta(k){
   i = k;
   renderDeck();
