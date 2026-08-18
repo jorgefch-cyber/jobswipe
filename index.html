@@ -343,6 +343,57 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
 .links a{flex:1;text-align:center;font-size:12px;font-weight:700;padding:9px 8px;border-radius:9px;text-decoration:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--txt)}
 .links a.pri{background:var(--accent);border-color:var(--accent);color:#0a0d18}
 .srcline{padding:9px 16px 0;font-size:10.5px;color:var(--txt-3);text-align:center}
+/* ---- login con Google ---- */
+#gate{position:fixed;inset:0;background:var(--bg);z-index:900;display:none;place-items:center;padding:26px}
+#gate.on{display:grid}
+.gbox{width:100%;max-width:340px;text-align:center}
+.gbox .mark{width:56px;height:56px;border-radius:17px;background:linear-gradient(135deg,var(--accent),var(--yes));display:grid;place-items:center;margin:0 auto 20px;font-size:25px;font-weight:800;color:#0a0d18}
+.gbox h2{font-size:22px;margin-bottom:9px}
+.gbox p{font-size:13.5px;color:var(--txt-2);line-height:1.55;margin-bottom:22px}
+.gbtn{width:100%;background:#fff;color:#1f1f1f;border-radius:13px;padding:13px;font-size:14.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px}
+.gbtn svg{width:19px;height:19px;flex-shrink:0}
+.gbtn:active{transform:scale(.985)}
+.gerr{margin-top:14px;font-size:12.5px;color:var(--no);line-height:1.5;display:none}
+.gerr.on{display:block}
+.gskip{margin-top:16px;font-size:12px;color:var(--txt-3);background:none;text-decoration:underline}
+.gwho{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--txt-3)}
+.gwho img{width:19px;height:19px;border-radius:50%}
+.gwho button{background:none;color:var(--txt-3);font-size:11px;text-decoration:underline}
+
+/* ---- motor de envío: tarjetas por aprobar ---- */
+.env{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:16px;padding:15px;margin-bottom:11px}
+.env.espera{border-left-color:var(--warn)}
+.env.falta{border-left-color:var(--no)}
+.envh{display:flex;align-items:center;gap:11px;margin-bottom:11px}
+.envh .logo{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;font-weight:800;font-size:14px;color:#0a0d18;flex-shrink:0}
+.envh .t{flex:1;min-width:0}
+.envh .t b{display:block;font-size:14.5px;line-height:1.25}
+.envh .t span{display:block;font-size:11.5px;color:var(--txt-3);margin-top:2px}
+.envtag{font-size:9.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;padding:4px 8px;border-radius:100px;flex-shrink:0}
+.envtag.rev{background:rgba(123,140,255,.18);color:var(--accent)}
+.envtag.pre{background:var(--surface-2);color:var(--txt-3)}
+.envtag.fal{background:rgba(244,88,95,.15);color:var(--no)}
+.envcv{display:flex;align-items:center;gap:9px;background:var(--bg);border:1px solid var(--line-2);border-radius:11px;padding:10px 12px;margin-bottom:9px}
+.envcv svg{width:17px;height:17px;stroke:var(--yes);fill:none;stroke-width:2;flex-shrink:0}
+.envcv b{font-size:12.5px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.envcv a{font-size:11.5px;color:var(--accent);text-decoration:none;font-weight:700;flex-shrink:0}
+.envcampos{background:var(--bg);border:1px solid var(--line-2);border-radius:11px;padding:4px 0;margin-bottom:9px;max-height:210px;overflow-y:auto}
+.envcampos .cp{display:flex;gap:10px;padding:7px 12px;border-bottom:1px solid var(--line);font-size:12px;line-height:1.4}
+.envcampos .cp:last-child{border-bottom:none}
+.envcampos .cp i{color:var(--txt-3);font-style:normal;flex-shrink:0;min-width:34%;max-width:34%}
+.envcampos .cp span{color:var(--txt);word-break:break-word}
+.envfalta{background:rgba(244,88,95,.07);border:1px solid rgba(244,88,95,.25);border-radius:11px;padding:11px 13px;margin-bottom:9px}
+.envfalta b{display:block;font-size:11px;color:var(--no);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.envfalta li{font-size:12.5px;color:var(--txt-2);line-height:1.45;margin-bottom:5px;list-style:none;padding-left:14px;position:relative}
+.envfalta li::before{content:"?";position:absolute;left:2px;color:var(--no);font-weight:800}
+.envnota{font-size:12.5px;color:var(--txt-2);line-height:1.5;margin-bottom:10px}
+.envbtns{display:flex;gap:7px}
+.envbtns button{flex:1;padding:11px 8px;border-radius:11px;font-size:12.5px;font-weight:700}
+.envbtns .ok{background:var(--yes);color:#04241c}
+.envbtns .no{background:transparent;border:1px solid var(--line-2);color:var(--txt-3)}
+.envbtns .no:hover{color:var(--no);border-color:var(--no)}
+.envbtns a{flex:1;text-align:center;padding:11px 8px;border-radius:11px;font-size:12.5px;font-weight:700;text-decoration:none;background:var(--surface-2);border:1px solid var(--line-2);color:var(--txt)}
+
 ::-webkit-scrollbar{width:0;display:none}
 </style>
 </head>
@@ -350,6 +401,7 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
 
 <header>
   <div class="brand"><span class="dot" id="conn"></span>JobSwipe</div>
+  <div id="quien"></div>
   <div class="counter" id="counter">conectando…</div>
 </header>
 
@@ -363,6 +415,11 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
         Agregar una vacante que encontré
       </button>
+
+      <div class="psec" id="envsec" style="display:none">
+        <h3>Listas para enviar <em id="envcount"></em></h3>
+        <div id="envios"></div>
+      </div>
 
       <div class="psec">
         <h3>Próximas entrevistas <em id="ivcount"></em></h3>
@@ -454,6 +511,19 @@ nav{display:flex;background:var(--bg-2);border-top:1px solid var(--line);flex-sh
   </section>
 </main>
 
+<div id="gate">
+  <div class="gbox">
+    <div class="mark">J</div>
+    <h2>JobSwipe</h2>
+    <p>Entra con tu cuenta de Google para abrir tu base. La sesión se queda guardada: no tienes que volver a entrar cada rato.</p>
+    <button class="gbtn" onclick="entrar()">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.65l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0012 23z"/><path fill="#FBBC05" d="M5.84 14.11a6.6 6.6 0 010-4.22V7.05H2.18a11 11 0 000 9.9l3.66-2.84z"/><path fill="#EA4335" d="M12 4.75c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 1.46 14.97.5 12 .5A11 11 0 002.18 7.05l3.66 2.84c.87-2.6 3.3-4.14 6.16-4.14z"/></svg>
+      Entrar con Google
+    </button>
+    <div class="gerr" id="gerr"></div>
+    <button class="gskip" id="gskip" onclick="saltarLogin()">Entrar sin cuenta por ahora</button>
+  </div>
+</div>
 <nav>
   <button class="tab on" onclick="go('panel',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Panel</button>
   <button class="tab" onclick="go('deck',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linejoin="round"><rect x="3" y="5" width="14" height="15" rx="2"/><path d="M20 8v9a2 2 0 01-2 2"/></svg>Descubrir</button>
@@ -494,6 +564,34 @@ const PROJECT = "jobswipe-888b8";
 const APIKEY  = "AIzaSyCXyQZSYeaWV97Jgal0OsUpURPZEcqStyg";
 const BASE = `https://firestore.googleapis.com/v1/projects/${PROJECT}/databases/(default)/documents`;
 
+/* ---------------- sesión de Google ----------------
+   AUTH.token() devuelve un ID token fresco (el SDK lo renueva solo).
+   La sesión vive en localStorage con browserLocalPersistence: sobrevive
+   cerrar el navegador y dura hasta que Jorge cierre sesión a propósito,
+   no una hora ni un día. Mientras no haya sesión, se usa la API key. */
+const AUTH = {
+  user: null,
+  listo: false,
+  async token(){
+    try{
+      if(window.__fbUser) return await window.__fbUser.getIdToken();
+    }catch(e){}
+    return null;
+  },
+  async hdr(base){
+    const h = Object.assign({}, base || {});
+    const t = await this.token();
+    if(t) h['Authorization'] = 'Bearer ' + t;
+    return h;
+  },
+  async q(){ return (await this.token()) ? '' : 'key=' + APIKEY; }
+};
+/* junta querystring respetando si ya hay parámetros */
+function qs(){
+  const p = [...arguments].filter(Boolean);
+  return p.length ? '?' + p.join('&') : '';
+}
+
 const wrap = v => {
   if (typeof v === 'boolean') return {booleanValue:v};
   if (typeof v === 'number')  return Number.isInteger(v) ? {integerValue:String(v)} : {doubleValue:v};
@@ -515,7 +613,7 @@ const unwrap = f => {
   return null;
 };
 async function fsList(col){
-  const r = await fetch(`${BASE}/${col}?key=${APIKEY}&pageSize=300`);
+  const r = await fetch(`${BASE}/${col}${qs(await AUTH.q(), 'pageSize=300')}`, {headers: await AUTH.hdr()});
   if(!r.ok) throw new Error('HTTP ' + r.status);
   const d = await r.json();
   return (d.documents||[]).map(doc => Object.assign(
@@ -524,22 +622,22 @@ async function fsList(col){
 }
 async function fsPatch(col, id, data){
   const keys = Object.keys(data).map(k => `updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&');
-  const r = await fetch(`${BASE}/${col}/${id}?key=${APIKEY}&${keys}`, {
-    method:'PATCH', headers:{'Content-Type':'application/json'},
+  const r = await fetch(`${BASE}/${col}/${id}${qs(await AUTH.q(), keys)}`, {
+    method:'PATCH', headers: await AUTH.hdr({'Content-Type':'application/json'}),
     body: JSON.stringify({fields: Object.fromEntries(Object.entries(data).map(([k,v])=>[k,wrap(v)]))})});
   if(!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
 }
 async function fsSet(col, id, data){
-  const r = await fetch(`${BASE}/${col}/${id}?key=${APIKEY}`, {
-    method:'PATCH', headers:{'Content-Type':'application/json'},
+  const r = await fetch(`${BASE}/${col}/${id}${qs(await AUTH.q())}`, {
+    method:'PATCH', headers: await AUTH.hdr({'Content-Type':'application/json'}),
     body: JSON.stringify({fields: Object.fromEntries(Object.entries(data).map(([k,v])=>[k,wrap(v)]))})});
   if(!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
 }
 async function fsAdd(col, data){
-  const r = await fetch(`${BASE}/${col}?key=${APIKEY}`, {
-    method:'POST', headers:{'Content-Type':'application/json'},
+  const r = await fetch(`${BASE}/${col}${qs(await AUTH.q())}`, {
+    method:'POST', headers: await AUTH.hdr({'Content-Type':'application/json'}),
     body: JSON.stringify({fields: Object.fromEntries(Object.entries(data).map(([k,v])=>[k,wrap(v)]))})});
   if(!r.ok) throw new Error('HTTP ' + r.status);
   return r.json();
@@ -903,6 +1001,202 @@ async function enviarRespuesta(id, v){
     await fsPatch('chat', id, {needsReply:false});
   }catch(e){ toast('No se pudo enviar'); }
 }
+/* ---------------- login con Google ----------------
+   EXIGIR_LOGIN se pone en true cuando las reglas de Firestore ya estén
+   cerradas. Mientras sea false, la app funciona con o sin sesión, para
+   que un problema de login no deje a Jorge sin acceso a sus vacantes. */
+const EXIGIR_LOGIN = false;
+const CORREO_DUENO = 'jorgefabre134@gmail.com';
+
+function mostrarGate(v){
+  const g = document.getElementById('gate');
+  if(g) g.classList.toggle('on', !!v);
+  const sk = document.getElementById('gskip');
+  if(sk) sk.style.display = EXIGIR_LOGIN ? 'none' : '';
+}
+function gateError(msg){
+  const e = document.getElementById('gerr');
+  if(e){ e.textContent = msg; e.classList.toggle('on', !!msg); }
+}
+function saltarLogin(){
+  sessionStorage.setItem('js_sin_login','1');
+  mostrarGate(false);
+  arrancar();
+}
+async function entrar(){
+  gateError('');
+  if(!window.__fbEntrar){ gateError('Todavía estoy cargando Google. Dame dos segundos y vuelve a intentar.'); return; }
+  try{ await window.__fbEntrar(); }
+  catch(e){
+    const c = (e && e.code) || '';
+    if(c === 'auth/popup-blocked' || c === 'auth/operation-not-supported-in-this-environment'){
+      gateError('Tu navegador bloqueó la ventana. Te mando por el otro camino…');
+      try{ await window.__fbRedirect(); }catch(e2){ gateError('No se pudo abrir Google: ' + (e2.message||e2)); }
+    } else if(c === 'auth/unauthorized-domain'){
+      gateError('Falta autorizar este dominio en Firebase. Dímelo y lo arreglo.');
+    } else if(c !== 'auth/cancelled-popup-request' && c !== 'auth/popup-closed-by-user'){
+      gateError('No se pudo entrar: ' + (e.message || e));
+    }
+  }
+}
+async function salir(){
+  if(window.__fbSalir){ await window.__fbSalir(); }
+  sessionStorage.removeItem('js_sin_login');
+  location.reload();
+}
+function pintarQuien(){
+  const el = document.getElementById('quien');
+  if(!el) return;
+  const u = window.__fbUser;
+  el.innerHTML = u
+    ? `<span class="gwho">${u.photoURL?`<img src="${esc(u.photoURL)}" alt="">`:''}${esc(u.email||'')} <button onclick="salir()">salir</button></span>`
+    : '';
+}
+
+/* lo llama el módulo de Firebase cada vez que cambia la sesión */
+window.__onAuth = function(user){
+  window.__fbUser = user || null;
+  AUTH.user = user || null;
+  AUTH.listo = true;
+  pintarQuien();
+  if(user){
+    if(user.email && user.email.toLowerCase() !== CORREO_DUENO){
+      gateError('Esa cuenta no es la tuya (' + user.email + '). Sal y entra con ' + CORREO_DUENO + '.');
+      mostrarGate(true);
+      return;
+    }
+    mostrarGate(false);
+    arrancar();
+  } else if(EXIGIR_LOGIN && !sessionStorage.getItem('js_sin_login')){
+    mostrarGate(true);
+  } else if(!sessionStorage.getItem('js_sin_login')){
+    mostrarGate(true);
+  } else {
+    mostrarGate(false);
+    arrancar();
+  }
+};
+
+/* ---- puente para las tareas programadas ----
+   Las tareas corren javascript_tool DENTRO de esta página. Con esto
+   heredan la sesión de Jorge en vez de usar la API key suelta. */
+window.JS = {
+  async token(){ return await AUTH.token(); },
+  async get(path){
+    const r = await fetch(`${BASE}/${path}${qs(await AUTH.q())}`, {headers: await AUTH.hdr()});
+    return {status:r.status, data: r.ok ? await r.json() : await r.text()};
+  },
+  async set(col, id, obj, mask){
+    const m = mask ? Object.keys(obj).map(k=>`updateMask.fieldPaths=${encodeURIComponent(k)}`).join('&') : '';
+    const r = await fetch(`${BASE}/${col}/${id}${qs(await AUTH.q(), m)}`, {
+      method:'PATCH', headers: await AUTH.hdr({'Content-Type':'application/json'}),
+      body: JSON.stringify({fields: Object.fromEntries(Object.entries(obj).map(([k,v])=>[k,wrap(v)]))})});
+    return r.status;
+  },
+  async add(col, obj){
+    const r = await fetch(`${BASE}/${col}${qs(await AUTH.q())}`, {
+      method:'POST', headers: await AUTH.hdr({'Content-Type':'application/json'}),
+      body: JSON.stringify({fields: Object.fromEntries(Object.entries(obj).map(([k,v])=>[k,wrap(v)]))})});
+    return r.status;
+  },
+  wrap: wrap, unwrap: unwrap, base: BASE,
+  quien(){ return AUTH.user ? AUTH.user.email : null; }
+};
+
+/* ---------------- motor de envío: revisión y aprobación ---------------- */
+const ENV_TAG = {
+  preparando:      ['pre','Preparando'],
+  por_aprobar:     ['rev','Por revisar'],
+  necesita_datos:  ['fal','Me falta un dato'],
+  error:           ['fal','Se atoró']
+};
+
+function renderEnvios(){
+  const box = document.getElementById('envios');
+  const sec = document.getElementById('envsec');
+  if(!box || !sec) return;
+
+  const lista = HIST.filter(a => ['preparando','por_aprobar','necesita_datos','error'].includes(a.estadoEnvio))
+                    .sort((a,b) => String(b.ts||'').localeCompare(String(a.ts||'')));
+
+  sec.style.display = lista.length ? '' : 'none';
+  const cn = document.getElementById('envcount');
+  if(cn) cn.textContent = lista.length ? `${lista.length} esperándote` : '';
+  if(!lista.length){ box.innerHTML = ''; return; }
+
+  box.innerHTML = lista.map(a => {
+    const [k, txt] = ENV_TAG[a.estadoEnvio] || ['pre','Preparando'];
+    const cls = a.estadoEnvio === 'por_aprobar' ? 'env' :
+                a.estadoEnvio === 'preparando'  ? 'env espera' : 'env falta';
+    const campos = (a.campos || []).map(c => {
+      const cc = (typeof c === 'string') ? {c:c, v:''} : c;
+      return `<div class="cp"><i>${esc(cc.c||'')}</i><span>${esc(cc.v||'')}</span></div>`;
+    }).join('');
+    const faltan = (a.preguntas || []).map(q => `<li>${esc(q)}</li>`).join('');
+    const listo = a.estadoEnvio === 'por_aprobar';
+
+    return `<div class="${cls}">
+      <div class="envh">
+        <div class="logo" style="background:${esc(a.color||'#7b8cff')}">${initial(a.co)}</div>
+        <div class="t"><b>${esc(NA(a.co))}</b><span>${esc(NA(a.role))}${a.portal && a.portal!=='NA' ? ' · '+esc(a.portal) : ''}</span></div>
+        <span class="envtag ${k}">${txt}</span>
+      </div>
+      ${a.notaEnvio ? `<p class="envnota">${esc(a.notaEnvio)}</p>` : ''}
+      ${a.cv && a.cv!=='NA' ? `<div class="envcv">
+        <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg>
+        <b>${esc(a.cv)}</b>
+        ${a.cvUrl && a.cvUrl!=='NA' ? `<a href="${esc(a.cvUrl)}" target="_blank" rel="noopener">Ver</a>` : ''}
+      </div>` : ''}
+      ${campos ? `<div class="envcampos">${campos}</div>` : ''}
+      ${faltan ? `<div class="envfalta"><b>Necesito esto de ti</b><ul>${faltan}</ul>
+        <div class="qr" style="margin-top:9px">
+          <textarea id="ev_${esc(a._id)}" rows="1" placeholder="Contéstame aquí…" oninput="grow(this)"></textarea>
+          <button onclick="responderEnvio('${esc(a._id)}')">Enviar</button>
+        </div></div>` : ''}
+      <div class="envbtns">
+        ${listo ? `<button class="ok" onclick="aprobarEnvio('${esc(a._id)}')">Aprobar y enviar</button>` : ''}
+        ${a.url && a.url!=='NA' ? `<a href="${esc(a.url)}" target="_blank" rel="noopener">Ver la vacante</a>` : ''}
+        <button class="no" onclick="cancelarEnvio('${esc(a._id)}')">Cancelar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function aprobarEnvio(id){
+  const a = HIST.find(x => x._id === id); if(!a) return;
+  a.estadoEnvio = 'aprobado';
+  renderEnvios(); renderHist(); renderPanel();
+  toast(`Aprobada — la mando a ${a.co}`);
+  try{ await fsPatch('apps', id, {estadoEnvio:'aprobado', aprobadaEl:new Date().toISOString(), aprobadaPor:'Jorge'}); }
+  catch(e){ toast('No se pudo guardar'); }
+}
+
+async function cancelarEnvio(id){
+  const a = HIST.find(x => x._id === id); if(!a) return;
+  a.estadoEnvio = 'cancelado'; a.status = 'Yo la cancelé';
+  renderEnvios(); renderHist(); renderPanel();
+  toast('Cancelada, no la mando');
+  try{ await fsPatch('apps', id, {estadoEnvio:'cancelado', status:'Yo la cancelé', actualizadoPor:'Jorge', actualizadoEl:new Date().toISOString()}); }
+  catch(e){ toast('No se pudo guardar'); }
+}
+
+async function responderEnvio(id){
+  const ta = document.getElementById('ev_' + id);
+  const v = ta && (ta.value||'').trim();
+  if(!v){ if(ta) ta.focus(); return; }
+  const a = HIST.find(x => x._id === id);
+  const co = a ? a.co : '';
+  ta.value = ''; ta.style.height = 'auto';
+  toast('Listo, con eso la termino');
+  CHAT.push({from:'me', text:v, ts:new Date().toISOString(), _id:'tmp'+Date.now()});
+  try{
+    await fsAdd('chat', {from:'me', text:v, ts:new Date().toISOString(), sobreEnvio:id, empresa:co});
+    await fsPatch('apps', id, {respuestaJorge:v, respondidoEl:new Date().toISOString(), estadoEnvio:'preparando'});
+    if(a){ a.respuestaJorge = v; a.estadoEnvio = 'preparando'; }
+    renderEnvios(); renderChat();
+  }catch(e){ toast('No se pudo enviar'); }
+}
+
 /* ---------------- no repintar mientras Jorge escribe ----------------
    sync() corre cada 8s y redibuja Panel, Historial y Test con innerHTML.
    Si el cursor esta dentro de uno de esos, el elemento se destruye a media
@@ -918,7 +1212,7 @@ function repintar(){
   if(escribiendo()){ repintarPend = true; return; }
   repintarPend = false;
   if(chatSucio){ chatSucio = false; renderChat(); }
-  renderHist(); renderPanel(); renderTest();
+  renderHist(); renderPanel(); renderTest(); renderEnvios();
 }
 document.addEventListener('focusout', () => {
   setTimeout(() => { if(repintarPend && !escribiendo()) repintar(); }, 220);
@@ -1220,14 +1514,57 @@ function toast(m){
 }
 
 /* ---------------- arranque ---------------- */
-sync();
-setInterval(sync, 8000);
-document.addEventListener('visibilitychange', () => { if(!document.hidden) sync(); });
+let arrancado = false;
+function arrancar(){
+  if(arrancado) return;
+  arrancado = true;
+  sync();
+  setInterval(sync, 8000);
+  document.addEventListener('visibilitychange', () => { if(!document.hidden) sync(); });
+}
+/* si en 3.5s Firebase no cargó (sin red, CDN bloqueado, etc.) arranca igual:
+   más vale la app funcionando con la API key que una pantalla en blanco */
+setTimeout(() => { if(!AUTH.listo){ mostrarGate(false); arrancar(); } }, 3500);
 
 /* ---------------- service worker ---------------- */
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(()=>{}));
 }
+</script>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect,
+           getRedirectResult, onAuthStateChanged, signOut,
+           setPersistence, browserLocalPersistence, indexedDBLocalPersistence
+         } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+  const app = initializeApp({
+    apiKey: "AIzaSyCXyQZSYeaWV97Jgal0OsUpURPZEcqStyg",
+    authDomain: "jobswipe-888b8.firebaseapp.com",
+    projectId: "jobswipe-888b8"
+  });
+  const auth = getAuth(app);
+
+  /* indexedDB primero, localStorage de respaldo. Con cualquiera de las dos
+     la sesión sobrevive cerrar el navegador y reiniciar la PC: dura hasta
+     que Jorge cierre sesión a propósito, no un día. */
+  try { await setPersistence(auth, indexedDBLocalPersistence); }
+  catch(e) { try { await setPersistence(auth, browserLocalPersistence); } catch(e2){} }
+
+  const prov = new GoogleAuthProvider();
+  prov.setCustomParameters({ prompt: 'select_account' });
+
+  window.__fbEntrar   = () => signInWithPopup(auth, prov);
+  window.__fbRedirect = () => signInWithRedirect(auth, prov);
+  window.__fbSalir    = () => signOut(auth);
+
+  try { await getRedirectResult(auth); } catch(e) {}
+
+  onAuthStateChanged(auth, u => {
+    window.__fbUser = u || null;
+    if (window.__onAuth) window.__onAuth(u);
+  });
 </script>
 </body>
 </html>
